@@ -4,6 +4,8 @@ from http.server import BaseHTTPRequestHandler,HTTPServer
 
 import paho.mqtt.client as paho
 
+import argparse
+
 
 spaceOpen = False
 brokerHost = "mqtt.devlol.org"
@@ -83,6 +85,11 @@ def on_disconnect(client, userdata, foo):
 def run(server_class=HTTPServer,
         handler_class=MyHandler):
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", default=8321, type=int)
+    args = parser.parse_args()
+    port = args.p
+
     ## setup MQTT client
     client = paho.Client()
     client.on_message = on_message
@@ -97,7 +104,7 @@ def run(server_class=HTTPServer,
     client.subscribe(mqttTopic)
 
 
-    server_address = ('', 8321)
+    server_address = ('', port)
     httpd = server_class(server_address, handler_class)
 
     while True:
