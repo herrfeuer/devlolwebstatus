@@ -23,20 +23,20 @@ class MyHandler(BaseHTTPRequestHandler):
         global spaceOpen
         if self.path == "/":
             self.send_response(200)
-            self.send_header("Content-type", "image/jpeg")
+            self.send_header("Content-type", "image/png")
             self.end_headers()
             if spaceOpen:
                 print("return OPEN")
                 #self.wfile.write(load('open.html'))
                 try:
-                    self.wfile.write(load_binary('open.jpg'))
+                    self.wfile.write(load_binary('open.png'))
                 except BrokenPipeError:
                     pass
             else:
                 print("return CLOSED")
                 #self.wfile.write(load('closed.html'))
                 try:
-                    self.wfile.write(load_binary('closed.jpg'))
+                    self.wfile.write(load_binary('closed.png'))
                 except BrokenPipeError:
                     pass
 
