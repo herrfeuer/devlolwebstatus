@@ -1,0 +1,16 @@
+[Unit]
+Description=/dev/lol webstatus
+After=network.service
+
+[Service]
+WorkingDirectory=/opt/webstatus/
+ExecStart=/opt/webstatus/devlolwebstatus -p 8321
+Restart=always
+RestartSec=5
+Type=simple
+User=webstatus
+Group=webstatus
+
+[Install]
+WantedBy=multi-user.target
+
