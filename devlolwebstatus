@@ -9,7 +9,6 @@ import argparse
 
 
 spaceOpen = False
-debug = False
 brokerHost = "mqtt.devlol.org"
 mqttTopic = "devlol/h19/door/lockstatus"
 
