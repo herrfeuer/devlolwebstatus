@@ -92,8 +92,9 @@ def run(server_class=HTTPServer,
 
     try:
         client.connect(brokerHost)
+        print ("connected to mqtt")
     except:
-        print("failed to connect")
+        print("failed to connect to mqtt")
         on_disconnect(client, None, None)
 
     client.subscribe(mqttTopic)
