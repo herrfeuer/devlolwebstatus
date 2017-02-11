@@ -27,16 +27,14 @@ class MyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             if spaceOpen:
                 print("return OPEN")
-                #self.wfile.write(load('open.html'))
                 try:
-                    self.wfile.write(load_binary('open.png'))
+                    self.wfile.write(load_binary('assets/open.png'))
                 except BrokenPipeError:
                     pass
             else:
                 print("return CLOSED")
-                #self.wfile.write(load('closed.html'))
                 try:
-                    self.wfile.write(load_binary('closed.png'))
+                    self.wfile.write(load_binary('assets/closed.png'))
                 except BrokenPipeError:
                     pass
 
@@ -53,19 +51,17 @@ def encode(file):
     return bytes(file, 'UTF-8')
 
 
-
 def on_message(client, userdata, msg):
     global spaceOpen
     payload = msg.payload.decode("utf-8")
     print(payload)
     """ Callback for mqtt message."""
-    if mqttTopic == msg.topic:
-        if payload == "UNLOCKED":
-            spaceOpen = True
-            print("UNLOCKED")
-        elif payload == "LOCKED":
-            spaceOpen = False
-            print("LOCKED")
+    if payload == "UNLOCKED":
+        spaceOpen = True
+        print("UNLOCKED")
+    elif payload == "LOCKED":
+        spaceOpen = False
+        print("LOCKED")
 
 
 def on_disconnect(client, userdata, foo):
@@ -79,7 +75,6 @@ def on_disconnect(client, userdata, foo):
         except:
             print("Failed to reconnect...")
             time.sleep(1)
-
 
 
 def run(server_class=HTTPServer,
