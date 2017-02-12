@@ -3,6 +3,7 @@
 from http.server import BaseHTTPRequestHandler,HTTPServer
 
 import paho.mqtt.client as paho
+import logging,sys
 
 import argparse
 
@@ -26,17 +27,15 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header("Content-type", "image/png")
             self.end_headers()
             if spaceOpen:
-                print("return OPEN")
-                #self.wfile.write(load('open.html'))
+                logging.info("return OPEN")
                 try:
-                    self.wfile.write(load_binary('open.png'))
+                    self.wfile.write(load_binary('assets/open.png'))
                 except BrokenPipeError:
                     pass
             else:
-                print("return CLOSED")
-                #self.wfile.write(load('closed.html'))
+                logging.info("return CLOSED")
                 try:
-                    self.wfile.write(load_binary('closed.png'))
+                    self.wfile.write(load_binary('assets/closed.png'))
                 except BrokenPipeError:
                     pass
 
@@ -53,19 +52,17 @@ def encode(file):
     return bytes(file, 'UTF-8')
 
 
-
 def on_message(client, userdata, msg):
     global spaceOpen
     payload = msg.payload.decode("utf-8")
-    print(payload)
+    logging.debug(payload)
     """ Callback for mqtt message."""
-    if mqttTopic == msg.topic:
-        if payload == "UNLOCKED":
-            spaceOpen = True
-            print("UNLOCKED")
-        elif payload == "LOCKED":
-            spaceOpen = False
-            print("LOCKED")
+    if payload == "UNLOCKED":
+        spaceOpen = True
+        logging.info("received mqtt: UNLOCKED")
+    elif payload == "LOCKED":
+        spaceOpen = False
+        logging.info("received mqtt: LOCKED")
 
 
 def on_disconnect(client, userdata, foo):
@@ -77,18 +74,23 @@ def on_disconnect(client, userdata, foo):
             # resubscribe to the topics
             client.subscribe(mqttTopic)
         except:
-            print("Failed to reconnect...")
+            logging.error("Failed to reconnect mqtt...")
             time.sleep(1)
-
 
 
 def run(server_class=HTTPServer,
         handler_class=MyHandler):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", default=8321, type=int)
+    parser.add_argument("-p", default=8321, help="port to bind to", type=int)
+    parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
     args = parser.parse_args()
     port = args.p
+
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.ERROR)
 
     ## setup MQTT client
     client = paho.Client()
@@ -97,8 +99,9 @@ def run(server_class=HTTPServer,
 
     try:
         client.connect(brokerHost)
+        logging.info ("connected to mqtt")
     except:
-        print("failed to connect")
+        logging.error("failed to connect to mqtt")
         on_disconnect(client, None, None)
 
     client.subscribe(mqttTopic)
